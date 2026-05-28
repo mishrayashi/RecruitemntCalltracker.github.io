@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HR Tracker">
+<title>HR Outreach Tracker</title>
+<style>
+:root{
+  --bg:#0f1116; --panel:#171a21; --panel2:#1d212b; --border:#2a2f3b;
+  --text:#e7e9f0; --muted:#8a90a2; --faint:#5a6072; --accent:#f3b14b;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,system-ui,"Segoe UI",Roboto,sans-serif;
+  -webkit-text-size-adjust:100%;}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;}
+.wrap{max-width:880px;margin:0 auto;padding:max(env(safe-area-inset-top),16px) 14px 40px;}
+a{color:inherit;text-decoration:none;}
+button,input,select,textarea,a.btn{font-family:inherit;}
+button{cursor:pointer;border:none;background:none;color:inherit;}
+button:active,a.btn:active{transform:translateY(1px);}
+input,textarea,select{outline:none;}
+input::placeholder,textarea::placeholder{color:var(--faint);}
+
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+h1{font-size:20px;font-weight:700;letter-spacing:-.3px;margin:0;display:flex;align-items:center;gap:8px;}
+.sub{color:var(--muted);font-size:13px;margin-top:4px;}
+.tools{display:flex;gap:8px;flex-wrap:wrap;}
+.tool{background:var(--panel);border:1px solid var(--border);color:var(--text);
+  font-weight:600;font-size:12px;padding:9px 12px;border-radius:10px;display:flex;align-items:center;gap:6px;}
+
+.cardbox{background:var(--panel);border:1px solid var(--border);border-radius:12px;}
+.prog{padding:16px;margin-bottom:16px;}
+.prog .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;}
+.bar{background:var(--panel2);border-radius:999px;height:8px;overflow:hidden;}
+.bar>div{height:100%;background:var(--accent);border-radius:999px;transition:width .3s;}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.chip{font-size:11px;padding:2px 8px;border-radius:6px;}
+
+.controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+.searchbox{background:var(--panel);border:1px solid var(--border);border-radius:9px;
+  display:flex;align-items:center;padding:0 10px;flex:1;min-width:180px;}
+.searchbox input{background:transparent;border:none;color:var(--text);font-size:14px;padding:10px 8px;width:100%;}
+select{background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px;font-size:13px;}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.tab{background:var(--panel2);border:1px solid var(--border);color:var(--muted);
+  font-weight:600;font-size:12px;padding:8px 12px;border-radius:10px;}
+.tab.on{background:var(--accent);color:#0f1116;border-color:var(--accent);}
+
+.list{display:flex;flex-direction:column;gap:8px;}
+.ct{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.ct .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}
+.nm{font-weight:600;font-size:14px;}
+.cmp{color:var(--muted);font-size:12px;}
+.ph{color:var(--accent);font-size:15px;font-weight:500;margin-top:2px;display:inline-block;}
+.meta{color:var(--faint);font-size:11px;margin-top:2px;}
+.stat{font-size:11px;font-weight:600;padding:3px 9px;border-radius:7px;white-space:nowrap;}
+
+.acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.b{font-weight:600;font-size:12px;padding:7px 11px;border-radius:9px;display:flex;align-items:center;gap:5px;border:1px solid var(--border);background:var(--panel2);color:var(--muted);}
+.b.call{background:var(--accent);color:#0f1116;border-color:var(--accent);}
+.b.wa{background:#13391f;color:#54d18c;border-color:#54d18c55;}
+.b.wa.off{background:var(--panel2);color:var(--muted);border-color:var(--border);}
+.b.more{margin-left:auto;}
+.exp{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.exp textarea{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);
+  border-radius:8px;padding:8px 10px;font-size:13px;resize:vertical;margin-top:2px;}
+.exp .line{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+.pbtn{font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:var(--panel2);color:var(--muted);}
+.date{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 8px;font-size:12px;}
+
+.empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;}
+.foot{color:var(--faint);font-size:11px;text-align:center;margin-top:20px;line-height:1.5;}
+
+.overlay{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:14px;width:100%;max-width:480px;padding:18px;max-height:90vh;overflow:auto;}
+.modal h3{margin:0 0 12px;font-size:16px;display:flex;justify-content:space-between;align-items:center;}
+.modal p{color:var(--muted);font-size:13px;margin:0 0 10px;}
+.modal input,.modal textarea{width:100%;background:var(--panel2);border:1px solid var(--border);
+  color:var(--text);border-radius:9px;padding:10px 12px;font-size:14px;margin-bottom:10px;resize:vertical;}
+.modal .end{display:flex;gap:8px;justify-content:flex-end;}
+.save{background:var(--accent);color:#0f1116;font-weight:700;padding:10px 16px;border-radius:9px;font-size:14px;}
+.ghost{background:var(--panel2);color:var(--muted);border:1px solid var(--border);padding:10px 16px;border-radius:9px;font-size:14px;}
+.warn{background:#2c1717;border:1px solid #f56c6c;color:#f5b5b5;padding:10px 12px;border-radius:10px;font-size:12px;margin-bottom:12px;}
+.ok{color:var(--accent);font-size:13px;margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div style="color:#8a90a2;padding:40px 4px;line-height:1.6">Starting HR Tracker&hellip;<br><br>If this text stays, this viewer isn&rsquo;t running the app. Open the file in <b style="color:#e7e9f0">Safari</b> (Files app &rarr; Downloads &rarr; tap the file), or use the live version inside the Claude chat.</div></div>
+
+<script>
+"use strict";
+const KEY="hr_outreach_tracker_v1";
+
+const STATUSES={
+  not_contacted:{label:"To Call",color:"#8a90a2",bg:"#23262f"},
+  attempted:{label:"No Answer",color:"#f3b14b",bg:"#2e2616"},
+  reached:{label:"Spoke",color:"#4cc4f5",bg:"#132831"},
+  callback:{label:"Callback",color:"#b07cf5",bg:"#241a33"},
+  promising:{label:"Promising",color:"#54d18c",bg:"#15291f"},
+  invalid:{label:"Invalid #",color:"#f56c6c",bg:"#2c1717"},
+  dead_end:{label:"Dead End",color:"#5a6072",bg:"#1c1f27"}
+};
+const SORDER=["not_contacted","attempted","reached","callback","promising","invalid","dead_end"];
+const PRIO={high:{label:"High",color:"#f56c6c"},med:{label:"Med",color:"#f3b14b"},low:{label:"Low",color:"#5a6072"}};
+
+/* ---------- persistence: window.storage (Claude) -> localStorage (Safari) ---------- */
+function withTimeout(p,ms,fb){ return new Promise(res=>{ let done=false;
+  const t=setTimeout(()=>{ if(!done){done=true;res(fb);} },ms);
+  Promise.resolve(p).then(v=>{ if(!done){done=true;clearTimeout(t);res(v);} }).catch(()=>{ if(!done){done=true;clearTimeout(t);res(fb);} });
+}); }
+const Store={
+  async load(){
+    if(window.storage){ try{ const r=await withTimeout(window.storage.get(KEY),1500,null); if(r&&r.value)return JSON.parse(r.value); }catch(e){} }
+    try{ const r=localStorage.getItem(KEY); return r?JSON.parse(r):[]; }catch(e){ return []; }
+  },
+  async save(d){
+    const s=JSON.stringify(d);
+    try{ if(window.storage){ await window.storage.set(KEY,s); return; } }catch(e){}
+    try{ localStorage.setItem(KEY,s); }catch(e){}
+  }
+};
+
+/* ---------- helpers ---------- */
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+const digits=s=>String(s||"").replace(/[^\d]/g,"");
+const looksPhone=s=>digits(s).length>=7;
+const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const today=()=>new Date().toISOString().slice(0,10);
+function fmtDate(iso){ if(!iso)return"—"; const d=new Date(iso); if(isNaN(d))return iso;
+  return d.toLocaleDateString("en-IN",{day:"2-digit",month:"short"}); }
+function waNum(p){ let d=digits(p); if(d.length===10)d="91"+d; if(d.length===11&&d[0]==="0")d="91"+d.slice(1); return d; }
+
+/* ---------- import parsers ---------- */
+function decodeQP(s){ try{return s.replace(/=\r?\n/g,"").replace(/=([0-9A-Fa-f]{2})/g,(_,h)=>String.fromCharCode(parseInt(h,16)));}catch(e){return s;} }
+function parseVCF(text){
+  const cards=text.split(/BEGIN:VCARD/i).slice(1); const out=[];
+  cards.forEach(block=>{
+    const raw=block.split(/\r?\n/); const lines=[];
+    raw.forEach(l=>{ if(/^[ \t]/.test(l)&&lines.length)lines[lines.length-1]+=l.replace(/^[ \t]/,""); else lines.push(l); });
+    let fn="",n="",org=""; const phones=[];
+    lines.forEach(line=>{
+      const ci=line.indexOf(":"); if(ci===-1)return;
+      const left=line.slice(0,ci); let right=line.slice(ci+1).trim();
+      const key=left.split(";")[0].split(".").pop().toUpperCase();
+      if(/ENCODING=QUOTED-PRINTABLE/i.test(left))right=decodeQP(right);
+      if(key==="FN")fn=right;
+      else if(key==="N")n=right;
+      else if(key==="ORG")org=right;
+      else if(key==="TEL"){ const p=right.replace(/\s+/g," ").trim(); if(p&&looksPhone(p))phones.push(p); }
+    });
+    let name=fn.trim();
+    if(!name&&n){ const p=n.split(";"); name=[p[1],p[0]].filter(Boolean).join(" ").trim()||n.replace(/;/g," ").trim(); }
+    name=name.trim().replace(/,+$/,"");
+    const company=(org.trim().toLowerCase()==="null"||!org.trim())?"":org.split(";")[0].trim();
+    const seen=new Set(); const pl=[];
+    phones.forEach(p=>{ if(!seen.has(digits(p))){seen.add(digits(p));pl.push(p);} });
+    if(!pl.length)return;
+    pl.forEach((p,i)=>out.push({name:name+(pl.length>1&&i>0?` (${i+1})`:""),company,phone:p}));
+  });
+  return out;
+}
+function parseCSV(text){
+  const rows=[]; let row=[],cur="",inQ=false;
+  for(let i=0;i<text.length;i++){ const ch=text[i];
+    if(inQ){ if(ch==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else inQ=false; } else cur+=ch; }
+    else{ if(ch==='"')inQ=true; else if(ch===","){row.push(cur);cur="";} else if(ch==="\n"){row.push(cur);rows.push(row);row=[];cur="";} else if(ch==="\r"){} else cur+=ch; }
+  }
+  if(cur!==""||row.length){row.push(cur);rows.push(row);}
+  return rows.filter(r=>r.some(c=>c.trim()!==""));
+}
+function parseImport(text){
+  const t=(text||"").trim(); if(!t)return[];
+  if(/BEGIN:VCARD/i.test(t))return parseVCF(t);
+  const rows=parseCSV(t); if(!rows.length)return[];
+  const out=[]; const first=(rows[0]||[]).map(c=>c.toLowerCase().trim());
+  const hasHeader=first.some(c=>["phone","number","mobile","name","company"].includes(c)||c.includes("phone")||c.includes("number"));
+  let idx={name:-1,company:-1,phone:-1},start=0;
+  if(hasHeader){ first.forEach((c,i)=>{
+      if(idx.name<0&&(c==="name"||c.includes("name")||c.includes("recruiter")||c==="hr"))idx.name=i;
+      if(idx.company<0&&(c.includes("company")||c.includes("org")||c.includes("firm")))idx.company=i;
+      if(idx.phone<0&&(c.includes("phone")||c.includes("number")||c.includes("mobile")))idx.phone=i;
+    }); start=1; }
+  for(let r=start;r<rows.length;r++){ const row=rows[r]; if(!row)continue;
+    let name="",company="",phone="";
+    if(hasHeader&&idx.phone>=0){ phone=row[idx.phone]||""; name=idx.name>=0?row[idx.name]||"":""; company=idx.company>=0?row[idx.company]||"":""; }
+    else if(row.length>=3){ name=row[0];company=row[1];phone=row[2]; }
+    else if(row.length===2){ if(looksPhone(row[1])){name=row[0];phone=row[1];} else if(looksPhone(row[0])){phone=row[0];company=row[1];} else {name=row[0];company=row[1];} }
+    else phone=row[0];
+    phone=String(phone).trim();
+    if(!phone||!looksPhone(phone))continue;
+    out.push({name:String(name).trim(),company:String(company).trim(),phone});
+  }
+  return out;
+}
+
+/* ---------- state ---------- */
+let S={contacts:[],search:"",tab:"todo",prio:"all",expanded:null,modal:null,importMsg:""};
+
+function init(){
+  render();                         // paint the UI immediately, never blank
+  (async()=>{ try{ const d=await Store.load(); if(Array.isArray(d)&&d.length){ S.contacts=d; render(); } }catch(e){} })();
+}
+function persist(){ Store.save(S.contacts); render(); }
+
+function setStatus(id,status){
+  const c=S.contacts.find(x=>x.id===id); if(!c)return;
+  const isAttempt=["attempted","reached","callback","invalid","promising"].includes(status);
+  c.status=status;
+  if(isAttempt)c.lastContact=today();
+  if(status==="attempted"||status==="reached")c.attempts=(c.attempts||0)+1;
+  persist();
+}
+function patch(id,p){ const c=S.contacts.find(x=>x.id===id); if(c){Object.assign(c,p);persist();} }
+function addContact(d){ S.contacts.unshift(Object.assign({id:uid(),name:"",company:"",phone:"",status:"not_contacted",attempts:0,whatsapp:false,priority:"med",lastContact:null,nextFollowup:"",notes:"",createdAt:Date.now()},d)); persist(); }
+function removeContact(id){ S.contacts=S.contacts.filter(c=>c.id!==id); persist(); }
+
+function doImport(text){
+  const rows=parseImport(text);
+  if(!rows.length){ S.importMsg="No valid phone numbers found. Check the format."; render(); return; }
+  const have=new Set(S.contacts.map(c=>digits(c.phone))); let added=0,dup=0;
+  const fresh=[];
+  rows.forEach(r=>{ const d=digits(r.phone); if(have.has(d)){dup++;return;} have.add(d);
+    fresh.push({id:uid(),name:r.name||"",company:r.company||"",phone:r.phone,status:"not_contacted",attempts:0,whatsapp:false,priority:"med",lastContact:null,nextFollowup:"",notes:"",createdAt:Date.now()}); added++; });
+  S.contacts=fresh.concat(S.contacts);
+  S.importMsg=`Added ${added} new number${added===1?"":"s"}${dup?` · skipped ${dup} duplicate${dup===1?"":"s"}`:""}.`;
+  persist();
+}
+
+/* ---------- export ---------- */
+function dl(content,fname,type){ const b=new Blob([content],{type}); const u=URL.createObjectURL(b);
+  const a=document.createElement("a"); a.href=u; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(u); }
+function csvCell(v){ v=String(v==null?"":v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+function exportCSV(){
+  const head=["Name","Company","Phone","Status","Attempts","WhatsApp","Priority","LastContacted","FollowUp","Notes"];
+  const lines=[head.join(",")];
+  S.contacts.forEach(c=>lines.push([c.name,c.company,c.phone,STATUSES[c.status].label,c.attempts,c.whatsapp?"Yes":"No",c.priority,c.lastContact||"",c.nextFollowup||"",c.notes].map(csvCell).join(",")));
+  dl(lines.join("\n"),`hr-outreach-${today()}.csv`,"text/csv");
+}
+function exportJSON(){ dl(JSON.stringify(S.contacts,null,2),`hr-outreach-backup-${today()}.json`,"application/json"); }
+
+/* ---------- derived ---------- */
+function stats(){ const s={total:S.contacts.length}; SORDER.forEach(k=>s[k]=0);
+  S.contacts.forEach(c=>s[c.status]=(s[c.status]||0)+1);
+  s.contacted=s.total-s.not_contacted; s.followups=s.callback+s.promising; return s; }
+function viewList(){
+  let l=S.contacts;
+  if(S.tab==="todo")l=l.filter(c=>c.status==="not_contacted"||c.status==="attempted");
+  else if(S.tab==="followups")l=l.filter(c=>c.status==="callback"||c.status==="promising");
+  else if(S.tab==="done")l=l.filter(c=>["reached","invalid","dead_end"].includes(c.status));
+  if(S.prio!=="all")l=l.filter(c=>c.priority===S.prio);
+  if(S.search.trim()){ const q=S.search.toLowerCase();
+    l=l.filter(c=>(c.name||"").toLowerCase().includes(q)||(c.company||"").toLowerCase().includes(q)||digits(c.phone).includes(digits(q))); }
+  return l;
+}
+
+/* ---------- render ---------- */
+function render(){
+  const s=stats(), pct=s.total?Math.round(s.contacted/s.total*100):0, list=viewList();
+  const standalone=!window.storage;
+  let h=`
+  <div class="head">
+    <div>
+      <h1>📞 HR Outreach Tracker</h1>
+      <div class="sub">${s.total} number${s.total===1?"":"s"} · ${s.contacted} contacted · ${s.reached} spoke · ${s.promising} promising</div>
+    </div>
+    <div class="tools">
+      <button class="tool" data-a="import">⬆ Import</button>
+      <button class="tool" data-a="add">＋ Add</button>
+      <button class="tool" data-a="csv">⬇ CSV</button>
+      <button class="tool" data-a="json">💾 Backup</button>
+    </div>
+  </div>`;
+
+  if(standalone) h+=`<div class="warn">⚠ Opened as a local file. Tap <b>Backup</b> at the end of every session — on iOS, saved data for local files can be wiped by Safari, so the JSON backup is your real save. Re-load it anytime via Import.</div>`;
+
+  h+=`<div class="cardbox prog">
+    <div class="row"><span class="label">Progress</span><span class="mono" style="color:var(--accent);font-weight:600">${pct}%</span></div>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="chips">${SORDER.filter(k=>s[k]>0).map(k=>`<span class="mono chip" style="color:${STATUSES[k].color};background:${STATUSES[k].bg};border:1px solid ${STATUSES[k].color}33">${STATUSES[k].label}: ${s[k]}</span>`).join("")}</div>
+  </div>`;
+
+  h+=`<div class="controls">
+    <div class="searchbox">🔍<input id="search" placeholder="Search name, company or number…" value="${esc(S.search)}"></div>
+    <select id="prio">
+      <option value="all"${S.prio==="all"?" selected":""}>All priority</option>
+      <option value="high"${S.prio==="high"?" selected":""}>High</option>
+      <option value="med"${S.prio==="med"?" selected":""}>Med</option>
+      <option value="low"${S.prio==="low"?" selected":""}>Low</option>
+    </select>
+  </div>`;
+
+  const tabs=[["todo",`To Call (${s.not_contacted+s.attempted})`],["followups",`Follow-ups (${s.followups})`],["done",`Closed (${s.reached+s.invalid+s.dead_end})`],["all",`All (${s.total})`]];
+  h+=`<div class="tabs">${tabs.map(([k,l])=>`<button class="tab${S.tab===k?" on":""}" data-tab="${k}">${l}</button>`).join("")}</div>`;
+
+  if(!list.length){
+    h+=`<div class="cardbox empty">${s.total===0?'No numbers yet. Tap <b style="color:var(--accent)">Import</b> to paste your HR list (.vcf, CSV, or plain numbers).':'Nothing in this view. Try another tab or clear the search.'}</div>`;
+  } else {
+    h+=`<div class="list">`;
+    list.forEach(c=>{
+      const st=STATUSES[c.status], open=S.expanded===c.id;
+      h+=`<div class="ct" style="border-left:3px solid ${PRIO[c.priority].color}">
+        <div class="top">
+          <div style="min-width:0">
+            <div><span class="nm">${esc(c.name)||'<span style="color:var(--faint)">Unknown HR</span>'}</span>${c.company?` <span class="cmp">· ${esc(c.company)}</span>`:""}</div>
+            <a class="ph mono" href="tel:${esc(c.phone)}">${esc(c.phone)}</a>
+            <div class="meta mono">${c.attempts>0?c.attempts+" attempt"+(c.attempts===1?"":"s")+" · ":""}last: ${fmtDate(c.lastContact)}${c.nextFollowup?" · follow-up "+fmtDate(c.nextFollowup):""}</div>
+          </div>
+          <span class="stat" style="color:${st.color};background:${st.bg};border:1px solid ${st.color}44">${st.label}</span>
+        </div>
+        <div class="acts">
+          <a class="btn b call" href="tel:${esc(c.phone)}">📞 Call</a>
+          <a class="btn b wa${c.whatsapp?"":" off"}" href="https://wa.me/${waNum(c.phone)}" target="_blank" rel="noreferrer" data-wa="${c.id}">✆ WhatsApp${c.whatsapp?" ✓":""}</a>
+          <button class="b" data-set="attempted" data-id="${c.id}" style="color:${STATUSES.attempted.color}">✕ No answer</button>
+          <button class="b" data-set="reached" data-id="${c.id}" style="color:${STATUSES.reached.color}">✓ Spoke</button>
+          <button class="b more" data-exp="${c.id}">${open?"▲":"▼"} More</button>
+        </div>`;
+      if(open){
+        h+=`<div class="exp">
+          <div class="line">
+            <button class="pbtn" data-set="callback" data-id="${c.id}" style="color:${STATUSES.callback.color}">⏱ Callback</button>
+            <button class="pbtn" data-set="promising" data-id="${c.id}" style="color:${STATUSES.promising.color}">★ Promising</button>
+            <button class="pbtn" data-set="invalid" data-id="${c.id}" style="color:${STATUSES.invalid.color}">⚠ Invalid #</button>
+            <button class="pbtn" data-set="dead_end" data-id="${c.id}" style="color:${STATUSES.dead_end.color}">✕ Dead end</button>
+            <button class="pbtn" data-set="not_contacted" data-id="${c.id}">↺ Reset</button>
+          </div>
+          <div class="line">
+            <span class="cmp">Priority:</span>
+            ${Object.keys(PRIO).map(p=>`<button class="pbtn" data-prio="${p}" data-id="${c.id}" style="${c.priority===p?`background:${PRIO[p].color};color:#0f1116;border-color:${PRIO[p].color}`:""}">${PRIO[p].label}</button>`).join("")}
+            <span class="cmp" style="margin-left:6px">Follow-up:</span>
+            <input class="date" type="date" value="${c.nextFollowup||""}" data-follow="${c.id}">
+          </div>
+          <textarea rows="2" placeholder="Notes — who you spoke to, role discussed, next step…" data-notes="${c.id}">${esc(c.notes)}</textarea>
+          <div class="line" style="margin-top:8px">
+            <button class="b" data-edit="${c.id}">✎ Edit details</button>
+            <button class="b" data-del="${c.id}" style="color:#f56c6c;background:#2c1717;border-color:#f56c6c55">🗑 Delete</button>
+          </div>
+        </div>`;
+      }
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+
+  h+=`<div class="foot">Saves automatically as you go.${standalone?" On iOS local files, also tap <b>Backup</b> daily — that JSON re-imports everything if Safari clears the data.":" Tap <b>Backup</b> daily for a downloadable safety copy."}</div>`;
+
+  // modals
+  if(S.modal==="import"){
+    h+=`<div class="overlay" data-close="1"><div class="modal" data-stop="1">
+      <h3>Import HR numbers <button data-close="1">✕</button></h3>
+      <p>Three formats auto-detected: <b style="color:var(--text)">paste raw .vcf / vCard contents</b>, plain numbers one per line, or <span class="mono">Name, Company, Phone</span> per line.</p>
+      <textarea id="impText" rows="9" placeholder="9876543210&#10;Priya Sharma, Acme Corp, 9811122233&#10;or paste your whole .vcf file here" style="font-family:'IBM Plex Mono',monospace"></textarea>
+      ${S.importMsg?`<div class="ok">${esc(S.importMsg)}</div>`:""}
+      <div class="end" style="margin-top:12px"><button class="ghost" data-close="1">Close</button><button class="save" data-doimport="1">Import</button></div>
+    </div></div>`;
+  }
+  if(S.modal&&S.modal.startsWith("form")){
+    const id=S.modal.slice(5)||null; const c=id?S.contacts.find(x=>x.id===id):{name:"",company:"",phone:"",priority:"med",notes:""};
+    h+=`<div class="overlay" data-close="1"><div class="modal" data-stop="1">
+      <h3>${id?"Edit contact":"Add contact"} <button data-close="1">✕</button></h3>
+      <input id="fName" placeholder="HR / recruiter name" value="${esc(c.name)}">
+      <input id="fCompany" placeholder="Company" value="${esc(c.company)}">
+      <input id="fPhone" placeholder="Phone number" value="${esc(c.phone)}" style="font-family:'IBM Plex Mono',monospace">
+      <div class="line" style="display:flex;gap:8px;align-items:center;margin-bottom:10px"><span class="cmp">Priority:</span>
+        ${Object.keys(PRIO).map(p=>`<button class="pbtn" data-fprio="${p}" style="${(c.priority||'med')===p?`background:${PRIO[p].color};color:#0f1116;border-color:${PRIO[p].color}`:""}">${PRIO[p].label}</button>`).join("")}</div>
+      <textarea id="fNotes" rows="2" placeholder="Notes">${esc(c.notes)}</textarea>
+      <div class="end"><button class="ghost" data-close="1">Cancel</button><button class="save" data-savecontact="${id||""}">Save</button></div>
+    </div></div>`;
+  }
+
+  const app=document.getElementById("app");
+  app.innerHTML=h;
+  bind();
+}
+
+let formPrio="med";
+function bind(){
+  const app=document.getElementById("app");
+  const search=document.getElementById("search");
+  if(search){ search.oninput=e=>{ S.search=e.target.value; const v=e.target.value;
+      // light re-render preserving focus
+      reRenderKeepFocus(()=>S.search=v,"search"); }; }
+  const prio=document.getElementById("prio");
+  if(prio)prio.onchange=e=>{S.prio=e.target.value;render();};
+
+  app.onclick=e=>{
+    const t=e.target.closest("[data-a],[data-tab],[data-set],[data-exp],[data-prio],[data-edit],[data-del],[data-close],[data-stop],[data-doimport],[data-savecontact],[data-fprio],[data-wa]");
+    if(!t)return;
+    if(t.dataset.stop!==undefined&&!t.closest("[data-close]")){ /* clicks inside modal */ }
+    if(t.dataset.a){ const a=t.dataset.a;
+      if(a==="import"){S.modal="import";S.importMsg="";render();}
+      if(a==="add"){S.modal="form";formPrio="med";render();}
+      if(a==="csv")exportCSV();
+      if(a==="json")exportJSON();
+      return;
+    }
+    if(t.dataset.tab){S.tab=t.dataset.tab;render();return;}
+    if(t.dataset.wa!==undefined){ patch(t.dataset.wa,{whatsapp:true}); /* link still opens */ return; }
+    if(t.dataset.set){setStatus(t.dataset.id,t.dataset.set);return;}
+    if(t.dataset.exp){S.expanded=S.expanded===t.dataset.exp?null:t.dataset.exp;render();return;}
+    if(t.dataset.prio){patch(t.dataset.id,{priority:t.dataset.prio});return;}
+    if(t.dataset.edit){S.modal="form-"+t.dataset.edit;render();return;}
+    if(t.dataset.del){removeContact(t.dataset.del);return;}
+    if(t.dataset.fprio){formPrio=t.dataset.fprio;
+        // update visual without losing typed inputs
+        document.querySelectorAll("[data-fprio]").forEach(b=>{const p=b.dataset.fprio;
+          b.style.cssText=p===formPrio?`background:${PRIO[p].color};color:#0f1116;border-color:${PRIO[p].color}`:"";});
+        return;}
+    if(t.dataset.doimport!==undefined){ const ta=document.getElementById("impText"); doImport(ta?ta.value:""); return; }
+    if(t.dataset.savecontact!==undefined){
+      const id=t.dataset.savecontact;
+      const d={name:val("fName"),company:val("fCompany"),phone:val("fPhone"),priority:formPrio,notes:val("fNotes")};
+      if(!d.phone.trim())return;
+      if(id){patch(id,d);} else addContact(d);
+      S.modal=null;render();return;
+    }
+    if(t.dataset.close!==undefined){S.modal=null;render();return;}
+  };
+
+  // inline notes + follow-up (attach without full re-render to keep focus)
+  app.querySelectorAll("[data-notes]").forEach(ta=>{ ta.oninput=e=>{ const c=S.contacts.find(x=>x.id===ta.dataset.notes); if(c){c.notes=e.target.value;Store.save(S.contacts);} }; });
+  app.querySelectorAll("[data-follow]").forEach(inp=>{ inp.onchange=e=>{ patch(inp.dataset.follow,{nextFollowup:e.target.value}); }; });
+}
+function val(id){ const el=document.getElementById(id); return el?el.value:""; }
+
+function reRenderKeepFocus(apply,focusId){
+  apply();
+  render();
+  const el=document.getElementById(focusId);
+  if(el){ el.focus(); try{ const v=el.value; el.value=""; el.value=v; }catch(e){} }
+}
+
+init();
+</script>
+</body>
+</html>
